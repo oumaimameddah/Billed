@@ -29,7 +29,6 @@ describe('Given I am connected as an employee', () => {
       console.log(datesSorted);
 
       expect(dates).toEqual(datesSorted);
-      // screen.debug();
     });
   });
 });
