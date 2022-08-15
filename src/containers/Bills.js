@@ -1,63 +1,86 @@
-import { ROUTES_PATH } from '../constants/routes.js';
+import VerticalLayout from './VerticalLayout.js';
+import ErrorPage from './ErrorPage.js';
+import LoadingPage from './LoadingPage.js';
 import { formatDate, formatStatus } from '../app/format.js';
-import Logout from './Logout.js';
 
-export default class {
-  constructor({ document, onNavigate, firestore, localStorage }) {
-    this.document = document;
-    this.onNavigate = onNavigate;
-    this.firestore = firestore;
-    const buttonNewBill = document.querySelector(
-        `button[data-testid="btn-new-bill"]`
-    );
-    if (buttonNewBill)
-      buttonNewBill.addEventListener('click', this.handleClickNewBill);
-    const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`);
-    if (iconEye)
-      iconEye.forEach((icon) => {
-        icon.addEventListener('click', (e) => this.handleClickIconEye(icon));
-      });
-    new Logout({ document, localStorage, onNavigate });
-  }
+import Actions from './Actions.js';
 
-  handleClickNewBill = (e) => {
-    this.onNavigate(ROUTES_PATH['NewBill']);
-  };
+const row = (bill) => {
+    return `
+    <tr>
+      <td>${bill.type}</td>
+      <td>${bill.name}</td>
+      <td>${formatDate(bill.date)}</td>
+      <td>${bill.amount} €</td>
+      <td>${formatStatus(bill.status)}</td>
+      <td>
+        ${Actions(bill.fileUrl, bill.id)}
+      </td>
+    </tr>
+    `;
+};
 
-  handleClickIconEye = (icon) => {
-    const billUrl = icon.getAttribute('data-bill-url');
-    // modified img width
-    const imgWidth = Math.floor($('#modaleFile').width() * 0.5);
-    $('#modaleFile')
-        .find('.modal-body')
-        .html(
-            `<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} /></div>`
-        );
-    $('#modaleFile').modal('show');
-  };
-
-  // no need to cover this function by tests
-  /* istanbul ignore next*/
-  getBills = () => {
-    const userEmail = localStorage.getItem('user')
-        ? JSON.parse(localStorage.getItem('user')).email
+const rows = (data) => {
+    return data && data.length
+        ? data
+            .sort((a, b) => {
+                return new Date(b.date) - new Date(a.date);
+            })
+            .map((bill) => row(bill))
+            .join('')
         : '';
-    if (this.firestore) {
-      return this.firestore
-          .bills()
-          .get()
-          .then((snapshot) => {
-            const bills = snapshot.docs
-                .map((doc) => ({
-                  ...doc.data(),
-                  date: formatDate(doc.data().date),
-                  status: formatStatus(doc.data().status),
-                }))
-                .filter((bill) => bill.email === userEmail);
-            console.log('length', bills.length);
-            return bills;
-          })
-          .catch((error) => error);
+};
+
+export default ({ data: bills, loading, error }) => {
+    const modal = () => `
+    <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Justificatif</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+    if (loading) {
+        return LoadingPage();
+    } else if (error) {
+        return ErrorPage(error);
     }
-  };
-}
+
+    return `
+    <div class='layout'>
+      ${VerticalLayout(120)}
+      <div class='content'>
+        <div class='content-header'>
+          <div class='content-title'> Mes notes de frais </div>
+          <button type="button" data-testid='btn-new-bill' class="btn btn-primary">Nouvelle note de frais</button>
+        </div>
+        <div id="data-table">
+        <table id="example" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                <th>Type</th>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody data-testid="tbody">
+            ${rows(bills)}
+          </tbody>
+          </table>
+        </div>
+      </div>
+      ${modal()}
+    </div>`;
+};
