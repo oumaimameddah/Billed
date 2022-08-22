@@ -68,7 +68,7 @@ describe("Given I am connected as an employee", () => {
             document.body.innerHTML = BillsUI({data: bills});
             // init bills display
             const billsContainer = new Bills({
-                document, onNavigate, firestore: null, localStorage: window.localStorage,
+                document, onNavigate, store: null, localStorage: window.localStorage,
             });
 
             // handle click event
@@ -88,7 +88,7 @@ describe("Given I am connected as an employee", () => {
             document.body.innerHTML = BillsUI({data: bills});
             // init bills display
             const billsContainer = new Bills({
-                document, onNavigate, firestore: null, localStorage: window.localStorage,
+                document, onNavigate, store: null, localStorage: window.localStorage,
             });
             // get DOM element
             const iconEye = screen.getAllByTestId('icon-eye')[0];
@@ -105,7 +105,7 @@ describe("Given I am connected as an employee", () => {
             document.body.innerHTML = BillsUI({data: bills});
             // init bills display
             const billsContainer = new Bills({
-                document, onNavigate, firestore: null, localStorage: window.localStorage,
+                document, onNavigate, store: null, localStorage: window.localStorage,
             });
             // get DOM element
             const iconEye = screen.getAllByTestId('icon-eye')[0];
