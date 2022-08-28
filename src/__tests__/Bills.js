@@ -149,7 +149,7 @@ describe("[INTEGRATION TEST] Given I am connected as an employee", () => {
                 "commentAdmin": "AAAAAAAAA"
             };
             const bills = await store.bills().update(updateBill);
-            expect(billsSpy).toHaveBeenCalledTimes(1);
+            expect(billsSpy).toHaveBeenCalled();
             expect(bills).toBeTruthy();
             expect(bills.id).toEqual("47qAXb6fIm2zOKkLzMro");
         })
