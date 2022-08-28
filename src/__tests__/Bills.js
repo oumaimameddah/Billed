@@ -11,6 +11,7 @@ import {localStorageMock} from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
 import userEvent from "@testing-library/user-event";
+import store from "../__mocks__/store.js";
 
 const onNavigate = (pathname) => {
     document.body.innerHTML = ROUTES({pathname});
@@ -115,16 +116,42 @@ describe("Given I am connected as an employee", () => {
             expect(document.querySelector('.modal')).toBeTruthy();
         })
     })
+})
 
-    describe("", () => {
-        test("", () => {
-
+// INTEGRATION TESTS
+describe("[INTEGRATION TEST] Given I am connected as an employee", () => {
+    describe("When I navigate to BillsUI", () => {
+        test("fetches bills from mock API GET", async () => {
+            const billsSpy = jest.spyOn(store, 'bills');
+            const bills = await store.bills().list();
+            expect(billsSpy).toHaveBeenCalledTimes(1);
+            expect(bills).toBeTruthy();
+            expect(bills.length).toEqual(4);
         })
-    })
+    });
 
-    describe("", () => {
-        test("", () => {
-
+    describe('When i update a bill', () => {
+        test("then its ok", async () => {
+            const billsSpy = jest.spyOn(store, 'bills');
+            const updateBill = {
+                "id": "AAAAAAAAAAAAAAAAA",
+                "vat": "AAAAAAAAAAA",
+                "amount": 100,
+                "name": "AAAAA",
+                "fileName": "AAAAAA.jpeg",
+                "commentary": "AAAAAA",
+                "pct": 20,
+                "type": "AAAAAAA",
+                "email": "a@a",
+                "fileUrl": "AAAAAAAAAAAAAAAAAAAAAAA",
+                "date": "AAAAAAAAAAAAAAA",
+                "status": "AAAAAAA",
+                "commentAdmin": "AAAAAAAAA"
+            };
+            const bills = await store.bills().update(updateBill);
+            expect(billsSpy).toHaveBeenCalledTimes(1);
+            expect(bills).toBeTruthy();
+            expect(bills.id).toEqual("47qAXb6fIm2zOKkLzMro");
         })
     })
 })
