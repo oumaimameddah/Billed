@@ -96,6 +96,41 @@ describe("Given I am connected as an employee", () => {
             });
         });
     });
+});
 
+// POST
+describe('[POST TESTS] Given I am connected as an employee', () => {
+    describe("When I am on NewBill Page", () => {
+        describe('When i submit the form', () => {
+            test('Then it should generate a new bill', async () => {
+                // Spy
+                const postSpy = jest.spyOn(store, 'bills');
 
-})
+                // new Bill
+                const newBill = {
+                    "id": "AAAAAAAAAAAAAAAAA",
+                    "vat": "AAAAAAAAAAA",
+                    "amount": 100,
+                    "name": "AAAAA",
+                    "fileName": "AAAAAA.jpeg",
+                    "commentary": "AAAAAA",
+                    "pct": 20,
+                    "type": "AAAAAAA",
+                    "email": "a@a",
+                    "fileUrl": "AAAAAAAAAAAAAAAAAAAAAAA",
+                    "date": "AAAAAAAAAAAAAAA",
+                    "status": "AAAAAAA",
+                    "commentAdmin": "AAAAAAAAA"
+                };
+
+                // create bill
+                const bills = await store.bills().create(newBill);
+
+                // expected results
+                expect(postSpy).toHaveBeenCalledTimes(1);
+                expect(bills).toBeTruthy();
+                expect(bills.key).toEqual('1234');
+            });
+        })
+    });
+});
