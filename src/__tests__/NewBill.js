@@ -92,7 +92,25 @@ describe("Given I am connected as an employee", () => {
 
         describe('When I submit a wrong attached file format', () => {
             test('Then the error message should be displayed', () => {
-
+                // DOM construction
+                document.body.innerHTML = NewBillUI();
+                // get DOM element
+                const newBill = new NewBill({
+                    document, onNavigate, store: store, localStorage: window.localStorage,
+                });
+                // handle event
+                const handleChangeFile = jest.fn(() => newBill.handleChangeFile);
+                const attachedFile = screen.getByTestId('file');
+                attachedFile.addEventListener('change', handleChangeFile);
+                fireEvent.change(attachedFile, {
+                    target: {
+                        files: [new File(['doc.pdf'], 'doc.pdf', {type: 'application/pdf'})],
+                    },
+                });
+                // expected results
+                expect(handleChangeFile).toHaveBeenCalled();
+                expect(attachedFile.files[0].name).toBe('doc.pdf');
+                expect(screen.getAllByText('Votre justificatif doit être une image de format (.jpg) ou (.jpeg) ou (.png)')).toBeTruthy();
             });
         });
     });
