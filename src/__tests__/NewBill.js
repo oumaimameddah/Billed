@@ -92,10 +92,63 @@ describe("Given I am connected as an employee", () => {
 
         describe('When I submit a wrong attached file format', () => {
             test('Then the error message should be displayed', () => {
-
+                // DOM construction
+                document.body.innerHTML = NewBillUI();
+                // get DOM element
+                const newBill = new NewBill({
+                    document, onNavigate, store: store, localStorage: window.localStorage,
+                });
+                // handle event
+                const handleChangeFile = jest.fn(() => newBill.handleChangeFile);
+                const attachedFile = screen.getByTestId('file');
+                attachedFile.addEventListener('change', handleChangeFile);
+                fireEvent.change(attachedFile, {
+                    target: {
+                        files: [new File(['doc.pdf'], 'doc.pdf', {type: 'application/pdf'})],
+                    },
+                });
+                // expected results
+                expect(handleChangeFile).toHaveBeenCalled();
+                expect(attachedFile.files[0].name).toBe('doc.pdf');
+                expect(screen.getAllByText('Votre justificatif doit être une image de format (.jpg) ou (.jpeg) ou (.png)')).toBeTruthy();
             });
         });
     });
+});
 
+// POST
+describe('[POST TESTS] Given I am connected as an employee', () => {
+    describe("When I am on NewBill Page", () => {
+        describe('When i submit the form', () => {
+            test('Then it should generate a new bill', async () => {
+                // Spy
+                const postSpy = jest.spyOn(store, 'bills');
 
-})
+                // new Bill
+                const newBill = {
+                    "id": "AAAAAAAAAAAAAAAAA",
+                    "vat": "AAAAAAAAAAA",
+                    "amount": 100,
+                    "name": "AAAAA",
+                    "fileName": "AAAAAA.jpeg",
+                    "commentary": "AAAAAA",
+                    "pct": 20,
+                    "type": "AAAAAAA",
+                    "email": "a@a",
+                    "fileUrl": "AAAAAAAAAAAAAAAAAAAAAAA",
+                    "date": "AAAAAAAAAAAAAAA",
+                    "status": "AAAAAAA",
+                    "commentAdmin": "AAAAAAAAA"
+                };
+
+                // create bill
+                const bills = await store.bills().create(newBill);
+
+                // expected results
+                expect(postSpy).toHaveBeenCalledTimes(1);
+                expect(bills).toBeTruthy();
+                expect(bills.key).toEqual('1234');
+            });
+        })
+    });
+});
