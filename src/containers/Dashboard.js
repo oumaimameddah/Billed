@@ -89,6 +89,7 @@ export default class {
     let close = this.id === bill.id;
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
+    if (this.counter%2 === 0) {
 
     bills.forEach(b => {
       $(`#open-bill${b.id}`).css({background: '#0D5AE5'})
@@ -97,15 +98,16 @@ export default class {
     $('.dashboard-right-container div').html(DashboardFormUI(bill))
     $('.vertical-navbar').css({height: '150vh'})
     this.counter++
+    }
 
-    if (close) {
+    else {
       $(`#open-bill${bill.id}`).css({background: '#0D5AE5'})
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({height: '120vh'})
       this.id = null;
-      this.counter++
+      this.counter = 0
     }
 
     $('#icon-eye-d').click(this.handleClickIconEye)
@@ -145,10 +147,11 @@ export default class {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
         .html("")
-      this.counter ++
+      this.counter = 0
     }
 
     bills.forEach(bill => {
+      $(`#open-bill${bill.id}`).unbind('click')
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
