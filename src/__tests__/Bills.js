@@ -19,6 +19,15 @@ const onNavigate = (pathname) => {
 
 describe("Given I am connected as an employee", () => {
 
+    describe("When i am in Loading page", () => {
+        test("Then, Loading page should be rendered ", () => {
+            // DOM construction
+            document.body.innerHTML = BillsUI({ loading: true });
+            // expected result
+            expect(screen.getAllByText('Loading...')).toBeTruthy();
+        })
+    })
+
     describe('When a back-end send an error message', () => {
         test('Then, Error page should be rendered', () => {
             // DOM construction
@@ -153,5 +162,31 @@ describe("[INTEGRATION TEST] Given I am connected as an employee", () => {
             expect(bills).toBeTruthy();
             expect(bills.id).toEqual("47qAXb6fIm2zOKkLzMro");
         })
-    })
+    });
+
+    describe("When i fetch the API and get (404) NOT FOUND ERROR", () => {
+        test("then should show 404", async () => {
+            // when call bills get 404 error
+            jest.spyOn(store, 'bills').mockImplementationOnce(() => Promise.reject(new Error('Erreur 404')));
+            // DOM
+            document.body.innerHTML = BillsUI({ error: 'Erreur 404' });
+            // await response
+            const message = await screen.getByText('Erreur 404');
+            // expected result
+            expect(message).toBeTruthy();
+        })
+    });
+
+    describe("When i fetch the API and get (500) INTERNAL SERVER ERROR", () => {
+        test("then should show 500", async () => {
+            // when call bills get 404 error
+            jest.spyOn(store, 'bills').mockImplementationOnce(() => Promise.reject(new Error('Erreur 500')));
+            // DOM
+            document.body.innerHTML = BillsUI({ error: 'Erreur 500' });
+            // await response
+            const message = await screen.getByText('Erreur 500');
+            // expected result
+            expect(message).toBeTruthy();
+        })
+    });
 })

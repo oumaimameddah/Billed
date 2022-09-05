@@ -8,6 +8,7 @@ import NewBill from "../containers/NewBill.js"
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import store from "../__mocks__/store.js";
 import {ROUTES} from "../constants/routes.js";
+import BillsUI from "../views/BillsUI.js";
 
 const onNavigate = (pathname) => {
     document.body.innerHTML = ROUTES({pathname});
@@ -150,5 +151,31 @@ describe('[POST TESTS] Given I am connected as an employee', () => {
                 expect(bills.key).toEqual('1234');
             });
         })
+
+        describe("When i fetch the API and get (404) NOT FOUND ERROR", () => {
+            test("then should show 404", async () => {
+                // when call bills get 404 error
+                jest.spyOn(store, 'bills').mockImplementationOnce(() => Promise.reject(new Error('Erreur 404')));
+                // DOM
+                document.body.innerHTML = BillsUI({ error: 'Erreur 404' });
+                // await response
+                const message = await screen.getByText('Erreur 404');
+                // expected result
+                expect(message).toBeTruthy();
+            })
+        });
+
+        describe("When i fetch the API and get (500) INTERNAL SERVER ERROR", () => {
+            test("then should show 500", async () => {
+                // when call bills get 404 error
+                jest.spyOn(store, 'bills').mockImplementationOnce(() => Promise.reject(new Error('Erreur 500')));
+                // DOM
+                document.body.innerHTML = BillsUI({ error: 'Erreur 500' });
+                // await response
+                const message = await screen.getByText('Erreur 500');
+                // expected result
+                expect(message).toBeTruthy();
+            })
+        });
     });
 });
